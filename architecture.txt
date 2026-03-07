@@ -1,0 +1,9 @@
+User Query
+    ↓
+[Retrieval Layer]  ← finds relevant chunks
+    ↓
+[Generation Layer] ← writes answer with citations
+    ↓
+[Verification Layer] ← checks citations are real
+    ↓
+Cited Answer
