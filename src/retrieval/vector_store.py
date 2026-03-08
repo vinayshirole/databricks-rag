@@ -92,6 +92,7 @@ def build_vector_index():
     return collection
 
 
+# --- Quick test of the vector search to verify everything is working --- #
 def test_vector_search(query: str = "How do I create a Delta table?"):
     """
     Quick sanity check — run one query and print top 5 results.
