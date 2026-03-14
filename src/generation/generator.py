@@ -30,21 +30,22 @@ def build_prompt(query: str, chunks: list[dict]) -> str:
 
     prompt = f"""You are a precise technical assistant for Databricks documentation.
 
-        STRICT RULES YOU MUST FOLLOW:
-        1. Answer ONLY using the context provided below. Do not use any outside knowledge.
-        2. Cite every factual claim with the chunk number like [0], [1], [2] etc.
-        3. If the context does not contain enough information to answer, say exactly: "I don't have enough information in the provided context to answer this question."
-        4. Never invent facts, dates, version numbers, or details not present in the context.
-        5. If you cite a chunk, the claim must be directly supported by that chunk's text.
-        6. Do not write summary sentences that cite multiple chunks at once.
-        7. Each sentence should cite exactly one chunk maximum.
+    STRICT RULES YOU MUST FOLLOW:
+    1. Answer ONLY using the context provided below. Do not use any outside knowledge.
+    2. Cite every factual claim with the chunk number like [0], [1], [2] etc.
+    3. If the context does not contain enough information to answer, say exactly: "I don't have enough information in the provided context to answer this question."
+    4. Never invent facts, dates, version numbers, or details not present in the context.
+    5. If you cite a chunk, the claim must be directly supported by that chunk's text.
+    6. Do not write summary sentences that cite multiple chunks at once.
+    7. Each sentence should cite exactly one chunk maximum.
+    8. After your answer, list the source URLs for every chunk you cited.
 
-        CONTEXT: {context}
+    CONTEXT:
+    {context}
 
-        QUESTION: {query}
+    QUESTION: {query}
 
-        ANSWER (cite every claim with URL if possible, and ONLY use the provided context to answer):
-    """
+    ANSWER (cite every claim with [chunk_number], then list sources at the end):"""
 
     return prompt
 
@@ -75,19 +76,28 @@ def verify_citations(answer: str, chunks: list[dict]) -> list[dict]:
 
     sentences = re.split(r'(?<=[.!?])\s+', answer)
 
-    skip_phrases = [
-        "therefore", "in summary", "in conclusion",
-        "to summarize", "thus", "overall", "so,"
-    ]
-
     stop_words = {
         "the", "a", "an", "is", "are", "was", "were",
         "to", "of", "in", "for", "on", "with", "by",
         "you", "can", "and", "or", "it", "this", "that"
     }
+    
+    skip_phrases = [
+        "therefore", "in summary", "in conclusion",
+        "to summarize", "thus", "overall", "so,",
+        "sources:", "source:", "references:", "cited sources:"
+    ]
+
+    negative_phrases = [
+        "not specified", "not mentioned", "does not",
+        "doesn't", "not provided", "not covered",
+        "not explain", "not contain"
+    ]
 
     for sentence in sentences:
         if any(sentence.lower().startswith(p) for p in skip_phrases):
+            continue
+        if any(p in sentence.lower() for p in negative_phrases):
             continue
 
         citations = re.findall(r'\[(\d+)\]', sentence)
