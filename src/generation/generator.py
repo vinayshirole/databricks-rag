@@ -1,11 +1,15 @@
 import re
-import ollama
+import os
+from groq import Groq
 from rich.console import Console
 
 console = Console()
 
-OLLAMA_MODEL = "llama3.2:3b"
+GROQ_MODEL = "llama-3.1-8b-instant"
 MAX_TOKENS = 1024
+
+# Uses GROQ_API_KEY environment variable automatically
+groq_client = Groq()
 
 
 def build_prompt(query: str, chunks: list[dict]) -> str:
@@ -162,17 +166,18 @@ def generate_answer(query: str, chunks: list[dict]) -> dict:
     prompt = build_prompt(query, chunks)
 
     console.print("[blue]Generating answer...[/blue]")
-    response = ollama.generate(
-        model=OLLAMA_MODEL,
-        prompt=prompt,
-        options={
-            "temperature": 0.1,
-            "num_predict": MAX_TOKENS,
-            "stop": ["QUESTION:", "CONTEXT:"]
-        }
+    response = groq_client.chat.completions.create(
+        model=GROQ_MODEL,
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1,
+        max_tokens=MAX_TOKENS,
+        stop=["QUESTION:", "CONTEXT:"]
     )
 
-    answer = response["response"].strip()
+    answer = response.choices[0].message.content.strip()
+
     citations_used = extract_citations(answer)
     verification_results = verify_citations(answer, chunks)
 
@@ -189,7 +194,7 @@ def generate_answer(query: str, chunks: list[dict]) -> dict:
         "chunks_used": len(chunks),
         "verification": verification_results,
         "hallucination_rate": hallucination_rate,
-        "model": OLLAMA_MODEL
+        "model": GROQ_MODEL
     }
 
 

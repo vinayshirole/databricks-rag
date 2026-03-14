@@ -1,0 +1,12 @@
+cat > .dockerignore << 'ENDOFFILE'
+venv/
+__pycache__/
+*.pyc
+.env
+.git/
+.DS_Store
+chroma_db/
+*.egg-info/
+notebooks/
+tests/
+ENDOFFILE
