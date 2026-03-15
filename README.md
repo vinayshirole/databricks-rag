@@ -224,9 +224,3 @@ A RAG system without verification has no way to distinguish grounded answers fro
 | GROQ_API_KEY | Yes | Groq API key from console.groq.com |
 | QDRANT_URL | Optional | Qdrant Cloud cluster URL |
 | QDRANT_API_KEY | Optional | Qdrant Cloud API key |
-
----
-
-## License
-
-MIT
