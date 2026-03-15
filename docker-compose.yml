@@ -1,8 +1,7 @@
-version: "3.8"
-
 services:
   rag-api:
     build: .
+    image: databricks-rag:latest
     ports:
       - "8000:8000"
     volumes:
