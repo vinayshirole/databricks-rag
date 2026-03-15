@@ -2,17 +2,6 @@
 
 A production-grade Retrieval-Augmented Generation (RAG) system for answering technical questions over Databricks documentation. Built with hybrid search, cross-encoder reranking, citation verification, and hallucination detection.
 
-## Live Demo
-
-**API:** `https://your-deployment-url/docs`
-
-**Example query:**
-```bash
-curl -X POST https://your-deployment-url/query \
-  -H "Content-Type: application/json" \
-  -d '{"query": "How do I create a Delta table?"}'
-```
-
 ---
 
 ## Architecture
